@@ -1,0 +1,17 @@
+SITE RECORDS WAY
+
+Arquivos inclusos:
+- index.html
+- style.css
+
+Como publicar gratuitamente:
+1. Acesse https://pages.github.com/
+2. Crie uma conta no GitHub.
+3. Crie um repositório chamado records-way.
+4. Envie os arquivos index.html e style.css.
+5. Vá em Settings > Pages.
+6. Selecione a branch main e salve.
+7. O site ficará online gratuitamente.
+
+Para alterar WhatsApp:
+Procure por 556234133632 no arquivo index.html e substitua pelo número desejado.
