@@ -1,17 +1,21 @@
-SITE RECORDS WAY
+SITE RECORDS WAY - VERSÃO PREMIUM
 
-Arquivos inclusos:
-- index.html
-- style.css
+Como colocar capas de lançamento:
+1. Abra a pasta img.
+2. Coloque as capas dentro dela.
+3. No arquivo index.html, troque cada bloco:
+   <div class="poster-img">Michael</div>
 
-Como publicar gratuitamente:
-1. Acesse https://pages.github.com/
-2. Crie uma conta no GitHub.
-3. Crie um repositório chamado records-way.
-4. Envie os arquivos index.html e style.css.
-5. Vá em Settings > Pages.
-6. Selecione a branch main e salve.
-7. O site ficará online gratuitamente.
+   por:
+   <img src="img/CASA DO DRAGÃO.webp" alt="CASA DO DRAGÃO">
 
-Para alterar WhatsApp:
-Procure por 556234133632 no arquivo index.html e substitua pelo número desejado.
+Exemplo:
+<div class="poster">
+  <img src="img/michael.jpg" alt="Michael">
+  <h3>Michael</h3>
+  <p>Lançamento</p>
+</div>
+
+Contato configurado no site:
+WhatsApp: 62 3413-3632
+Link: https://wa.me/556234133632
