@@ -1,279 +1,163 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RECORDS WAY - Streaming Premium</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #050505;
-      color: #fff;
-      overflow-x: hidden;
-    }
-    a { color: inherit; }
-    .btn {
-      display: inline-block;
-      padding: 14px 24px;
-      background: linear-gradient(135deg, #ff2020, #8b0000);
-      color: #fff;
-      text-decoration: none;
-      border-radius: 10px;
-      font-weight: 900;
-      box-shadow: 0 0 22px rgba(255,0,0,.35);
-      transition: .25s;
-      border: 1px solid rgba(255,255,255,.14);
-    }
-    .btn:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 30px rgba(255,0,0,.55); }
-    header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 8%;
-      background: rgba(0,0,0,.76);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-    .logo { font-size: 27px; font-weight: 950; letter-spacing: 1px; }
-    .logo span { color: #ff2020; }
-    nav { display: flex; gap: 22px; align-items: center; }
-    nav a { text-decoration: none; color: #ddd; font-weight: 700; font-size: 14px; }
-    nav a:hover { color: #ff3333; }
-    .hero {
-      min-height: 100vh;
-      padding: 130px 8% 70px;
-      display: grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap: 45px;
-      align-items: center;
-      background:
-        radial-gradient(circle at 85% 20%, rgba(255,0,0,.38), transparent 28%),
-        radial-gradient(circle at 15% 85%, rgba(150,0,0,.28), transparent 28%),
-        linear-gradient(135deg, #0b0b0b 0%, #150000 45%, #000 100%);
-      position: relative;
-    }
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 1px, transparent 1px 24px),
-        linear-gradient(90deg, rgba(0,0,0,.55), transparent, rgba(0,0,0,.8));
-      pointer-events: none;
-    }
-    .hero-content, .hero-showcase { position: relative; z-index: 2; }
-    .tag {
-      display: inline-block;
-      background: rgba(255,0,0,.15);
-      border: 1px solid rgba(255,0,0,.55);
-      padding: 9px 16px;
-      border-radius: 30px;
-      color: #ff5454;
-      font-weight: 900;
-      margin-bottom: 18px;
-      text-transform: uppercase;
-      font-size: 13px;
-    }
-    h1 {
-      font-size: clamp(43px, 7vw, 88px);
-      line-height: .92;
-      margin-bottom: 22px;
-      text-transform: uppercase;
-      letter-spacing: -2px;
-    }
-    h1 span { color: #ff2020; text-shadow: 0 0 28px rgba(255,0,0,.55); }
-    .subtitle { font-size: 20px; color: #ddd; line-height: 1.55; margin-bottom: 28px; max-width: 720px; }
-    .hero-actions { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
-    .btn-outline { background: rgba(255,255,255,.06); box-shadow: none; }
-    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 34px; max-width: 680px; }
-    .metric { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 18px; }
-    .metric strong { display: block; color: #ff3030; font-size: 25px; margin-bottom: 5px; }
-    .tv-frame {
-      border: 8px solid #191919;
-      border-radius: 28px;
-      background: linear-gradient(135deg,#080808,#220000);
-      min-height: 420px;
-      box-shadow: 0 0 55px rgba(255,0,0,.28);
-      padding: 24px;
-      overflow: hidden;
-      position: relative;
-    }
-    .screen-title { font-size: 23px; font-weight: 950; margin-bottom: 20px; }
-    .mini-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin-bottom: 18px; }
-    .mini-card { height: 135px; border-radius: 15px; background: linear-gradient(145deg,#4b0000,#111); border: 1px solid rgba(255,255,255,.12); display: flex; align-items: end; padding: 12px; font-weight: 900; font-size: 13px; box-shadow: inset 0 0 35px rgba(255,0,0,.18); }
-    .wide-card { height: 145px; border-radius: 18px; background: linear-gradient(120deg,#8d0000,#121212 62%); padding: 22px; display: flex; flex-direction: column; justify-content: flex-end; border: 1px solid rgba(255,255,255,.12); }
-    section { padding: 78px 8%; }
-    .section-title { text-align: center; font-size: clamp(30px, 4vw, 46px); text-transform: uppercase; margin-bottom: 14px; }
-    .section-title span { color: #ff2020; }
-    .section-desc { text-align: center; color: #cfcfcf; max-width: 740px; margin: 0 auto 42px; line-height: 1.55; }
-    .categories { background: #090909; }
-    .cat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; }
-    .cat { min-height: 150px; border-radius: 20px; padding: 24px; background: linear-gradient(145deg,#151515,#080808); border: 1px solid rgba(255,255,255,.09); position: relative; overflow: hidden; }
-    .cat::after { content:""; position:absolute; width:120px; height:120px; border-radius:50%; right:-35px; bottom:-35px; background:rgba(255,0,0,.25); filter:blur(5px); }
-    .cat h3 { font-size: 23px; margin-bottom: 8px; color: #fff; }
-    .cat p { color:#bbb; line-height:1.45; }
-    .launches { background: linear-gradient(180deg,#070707,#120000,#070707); overflow: hidden; }
-    .slider-wrap { width: 100%; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
-    .poster-track { display: flex; gap: 22px; width: max-content; animation: slide 30s linear infinite; }
-    .poster-track:hover { animation-play-state: paused; }
-    @keyframes slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-    .poster { width: 205px; flex: 0 0 auto; border-radius: 18px; background: #171717; border: 1px solid rgba(255,255,255,.13); overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,.45); transition:.25s; }
-    .poster:hover { transform: translateY(-8px) scale(1.02); border-color: rgba(255,0,0,.55); }
-    .poster-img { height: 305px; background: linear-gradient(145deg,#5f0000,#121212 70%); display: flex; align-items: center; justify-content: center; text-align: center; padding: 18px; font-size: 25px; font-weight: 950; text-transform: uppercase; color: #fff; }
-    .poster img { width: 100%; height: 305px; object-fit: cover; display: block; }
-    .poster h3 { padding: 14px 14px 4px; font-size: 17px; }
-    .poster p { padding: 0 14px 16px; color: #aaa; font-size: 13px; }
-    .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px; }
-    .plan { background: linear-gradient(180deg,#181818,#070707); border: 1px solid rgba(255,255,255,.1); border-radius: 20px; padding: 28px; position: relative; overflow: hidden; }
-    .plan::before { content:""; position:absolute; inset:0 0 auto; height:4px; background:#ff2020; }
-    .plan.featured { border-color: rgba(255,0,0,.55); box-shadow: 0 0 35px rgba(255,0,0,.18); }
-    .badge { display:inline-block; padding:6px 10px; border-radius:40px; background:#ff2020; font-size:12px; font-weight:900; margin-bottom:14px; }
-    .plan h3 { font-size: 22px; margin-bottom: 12px; }
-    .price { font-size: 38px; font-weight: 950; color: #ff2020; margin-bottom: 10px; }
-    .plan p { color:#ccc; margin-bottom: 22px; }
-    .about { background:#0b0b0b; border-top:1px solid rgba(255,255,255,.08); border-bottom:1px solid rgba(255,255,255,.08); }
-    .about-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap:22px; }
-    .box { padding:26px; background:rgba(255,255,255,.05); border-radius:18px; border:1px solid rgba(255,255,255,.08); }
-    .box h3 { color:#ff2020; margin-bottom:10px; font-size:22px; }
-    .box p { color:#cfcfcf; line-height:1.5; }
-    .contact { text-align:center; background: radial-gradient(circle at center, #5e0000, #000 70%); }
-    .phone { font-size: clamp(30px, 5vw, 54px); font-weight: 950; margin: 20px 0 30px; }
-    footer { padding:24px 8%; text-align:center; color:#aaa; background:#000; border-top:1px solid rgba(255,255,255,.08); }
-    .whatsapp-float { position: fixed; right: 22px; bottom: 22px; z-index: 30; width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg,#ff2020,#750000); display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:27px; box-shadow:0 0 25px rgba(255,0,0,.45); }
-    @media (max-width: 900px) {
-      nav { display: none; }
-      .hero { grid-template-columns: 1fr; padding-top: 115px; }
-      .tv-frame { min-height: 330px; }
-      .metrics { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 560px) {
-      header { padding: 15px 5%; }
-      .logo { font-size: 22px; }
-      section, .hero { padding-left: 5%; padding-right: 5%; }
-      .poster { width: 165px; }
-      .poster-img, .poster img { height: 245px; }
-      .mini-row { grid-template-columns: 1fr; }
-    }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#090909" />
+  <meta name="description" content="Web Player demonstrativo da RECORDS WAY para reprodução de conteúdos autorizados em HLS/M3U8." />
+  <title>RECORDS WAY | Web Player</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header>
-    <div class="logo">RECORDS <span>WAY</span></div>
-    <nav>
+  <header class="topbar" id="topbar">
+    <a class="brand" href="#inicio" aria-label="RECORDS WAY - início">
+      <span class="brand-mark">RW</span>
+      <span class="brand-name">RECORDS <strong>WAY</strong></span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Navegação principal">
       <a href="#inicio">Início</a>
-      <a href="#lancamentos">Lançamentos</a>
-      <a href="#pacotes">Pacotes</a>
-      <a href="#contato">Contato</a>
+      <a href="#ao-vivo">Ao vivo</a>
+      <a href="#filmes">Filmes</a>
+      <a href="#series">Séries</a>
+      <a href="#minha-lista">Minha lista</a>
     </nav>
-    <a class="btn" href="https://wa.me/556234133632" target="_blank">WHATSAPP</a>
+
+    <div class="top-actions">
+      <button class="icon-btn" id="searchToggle" aria-label="Abrir busca">⌕</button>
+      <button class="profile-btn" aria-label="Perfil do usuário">
+        <span>MW</span>
+      </button>
+    </div>
   </header>
 
   <main>
     <section class="hero" id="inicio">
+      <div class="hero-overlay"></div>
       <div class="hero-content">
-        <div class="tag">Streaming completo para você</div>
-        <h1>Filmes, séries e canais na <span>RECORDS WAY</span></h1>
-        <p class="subtitle">Tenha acesso a canais ao vivo, esportes, filmes, séries e lançamentos em uma plataforma moderna, prática e com planos acessíveis.</p>
+        <span class="eyebrow">RECORDS WAY ORIGINAL</span>
+        <h1>Entretenimento<br>sem limites</h1>
+        <p>Assista a canais ao vivo e conteúdos autorizados em qualquer dispositivo, com uma experiência moderna e rápida.</p>
         <div class="hero-actions">
-          <a class="btn" href="https://wa.me/556234133632" target="_blank">ASSINE AGORA</a>
-          <a class="btn btn-outline" href="#lancamentos">VER LANÇAMENTOS</a>
-        </div>
-        <div class="metrics">
-          <div class="metric"><strong>+900</strong>Canais ao vivo</div>
-          <div class="metric"><strong>24h</strong>Conteúdo disponível</div>
-          <div class="metric"><strong>02/03</strong>Telas por plano</div>
-        </div>
-      </div>
-      <div class="hero-showcase">
-        <div class="tv-frame">
-          <div class="screen-title">Em destaque agora</div>
-          <div class="mini-row">
-            <div class="mini-card">Filmes</div>
-            <div class="mini-card">Séries</div>
-            <div class="mini-card">Esportes</div>
-          </div>
-          <div class="wide-card">
-            <h2>Lançamentos disponíveis</h2>
-            <p>Atualize as capas na pasta <strong>img</strong> e deixe o site sempre renovado.</p>
-          </div>
+          <button class="btn btn-primary" data-play-id="destaque">▶ Assistir</button>
+          <button class="btn btn-secondary" data-info-id="destaque">ⓘ Mais informações</button>
         </div>
       </div>
     </section>
 
-    <section class="categories">
-      <h2 class="section-title">Conteúdo para <span>todos os gostos</span></h2>
-      <p class="section-desc">Organize sua vitrine por categorias e facilite a escolha dos seus clientes.</p>
-      <div class="cat-grid">
-        <div class="cat"><h3>TV ao Vivo</h3><p>Canais abertos, fechados, notícias e variedades.</p></div>
-        <div class="cat"><h3>Filmes</h3><p>Catálogo com ação, comédia, drama, terror e aventura.</p></div>
-        <div class="cat"><h3>Séries</h3><p>Temporadas completas e lançamentos para maratonar.</p></div>
-        <div class="cat"><h3>Esportes</h3><p>Futebol e grandes eventos esportivos ao vivo.</p></div>
+    <section class="search-panel" id="searchPanel" aria-hidden="true">
+      <div class="search-box">
+        <span>⌕</span>
+        <input id="searchInput" type="search" placeholder="Buscar canais, filmes ou séries" autocomplete="off" />
+        <button id="closeSearch" aria-label="Fechar busca">×</button>
       </div>
     </section>
 
-    <section class="launches" id="lancamentos">
-      <h2 class="section-title">Lançamentos em <span>destaque</span></h2>
-      <p class="section-desc">Para colocar capas reais, salve suas imagens dentro da pasta <strong>img</strong> com os nomes indicados no código.</p>
-      <div class="slider-wrap">
-        <div class="poster-track">
-          <div class="poster"><div class="poster-img">Michael</div><h3>Michael</h3><p>Lançamento</p></div>
-          <div class="poster"><div class="poster-img">Mortal Kombat II</div><h3>Mortal Kombat II</h3><p>Filme</p></div>
-          <div class="poster"><div class="poster-img">Casa do Dragão</div><h3>Casa do Dragão</h3><p>Série</p></div>
-          <div class="poster"><div class="poster-img">Superman</div><h3>Superman</h3><p>Filme</p></div>
-          <div class="poster"><div class="poster-img">Avatar</div><h3>Avatar</h3><p>Filme</p></div>
-          <div class="poster"><div class="poster-img">Quarteto Fantástico</div><h3>Quarteto Fantástico</h3><p>Filme</p></div>
-          <div class="poster"><div class="poster-img">Michael</div><h3>Michael</h3><p>Lançamento</p></div>
-          <div class="poster"><div class="poster-img">Mortal Kombat II</div><h3>Mortal Kombat II</h3><p>Filme</p></div>
-          <div class="poster"><div class="poster-img">Casa do Dragão</div><h3>Casa do Dragão</h3><p>Série</p></div>
-          <div class="poster"><div class="poster-img">Superman</div><h3>Superman</h3><p>Filme</p></div>
-          <div class="poster"><div class="poster-img">Avatar</div><h3>Avatar</h3><p>Filme</p></div>
-          <div class="poster"><div class="poster-img">Quarteto Fantástico</div><h3>Quarteto Fantástico</h3><p>Filme</p></div>
+    <section class="content-section first-section" id="ao-vivo">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">TRANSMISSÃO</span>
+          <h2>Canais ao vivo</h2>
+        </div>
+        <button class="text-btn" data-filter="live">Ver todos</button>
+      </div>
+      <div class="carousel-wrap">
+        <button class="carousel-arrow left" data-carousel="liveGrid" data-direction="-1" aria-label="Anterior">‹</button>
+        <div class="content-row" id="liveGrid"></div>
+        <button class="carousel-arrow right" data-carousel="liveGrid" data-direction="1" aria-label="Próximo">›</button>
+      </div>
+    </section>
+
+    <section class="content-section" id="filmes">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">EM DESTAQUE</span>
+          <h2>Filmes</h2>
+        </div>
+        <button class="text-btn" data-filter="movie">Ver todos</button>
+      </div>
+      <div class="carousel-wrap">
+        <button class="carousel-arrow left" data-carousel="moviesGrid" data-direction="-1" aria-label="Anterior">‹</button>
+        <div class="content-row" id="moviesGrid"></div>
+        <button class="carousel-arrow right" data-carousel="moviesGrid" data-direction="1" aria-label="Próximo">›</button>
+      </div>
+    </section>
+
+    <section class="content-section" id="series">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">PARA MARATONAR</span>
+          <h2>Séries</h2>
+        </div>
+        <button class="text-btn" data-filter="series">Ver todos</button>
+      </div>
+      <div class="carousel-wrap">
+        <button class="carousel-arrow left" data-carousel="seriesGrid" data-direction="-1" aria-label="Anterior">‹</button>
+        <div class="content-row" id="seriesGrid"></div>
+        <button class="carousel-arrow right" data-carousel="seriesGrid" data-direction="1" aria-label="Próximo">›</button>
+      </div>
+    </section>
+
+    <section class="content-section" id="minha-lista">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">SALVOS</span>
+          <h2>Minha lista</h2>
         </div>
       </div>
-    </section>
-
-    <section id="pacotes">
-      <h2 class="section-title">Nossos <span>pacotes</span></h2>
-      <p class="section-desc">Escolha o melhor plano e fale conosco pelo WhatsApp para ativação.</p>
-      <div class="plans">
-        <div class="plan"><h3>Pacote Mensal</h3><div class="price">R$34,99</div><p>Incluso 02 telas</p><a class="btn" href="https://wa.me/556234133632" target="_blank">Contratar</a></div>
-        <div class="plan"><h3>Pacote Bimestral</h3><div class="price">R$54,99</div><p>Incluso 02 telas</p><a class="btn" href="https://wa.me/556234133632" target="_blank">Contratar</a></div>
-        <div class="plan"><h3>Pacote Trimestral</h3><div class="price">R$79,99</div><p>Incluso 02 telas</p><a class="btn" href="https://wa.me/556234133632" target="_blank">Contratar</a></div>
-        <div class="plan featured"><span class="badge">MAIS COMPLETO</span><h3>Pacote Platinium</h3><div class="price">R$99,99</div><p>Incluso 03 telas</p><a class="btn" href="https://wa.me/556234133632" target="_blank">Contratar</a></div>
-        <div class="plan"><h3>Pacote Semestral</h3><div class="price">R$159,99</div><p>Incluso 03 telas</p><a class="btn" href="https://wa.me/556234133632" target="_blank">Contratar</a></div>
-        <div class="plan"><h3>Pacote Anual</h3><div class="price">R$309,99</div><p>Incluso 03 telas</p><a class="btn" href="https://wa.me/556234133632" target="_blank">Contratar</a></div>
+      <div class="empty-list" id="emptyList">
+        <span>＋</span>
+        <p>Adicione conteúdos à sua lista usando o botão “+”.</p>
       </div>
-    </section>
-
-    <section class="about">
-      <h2 class="section-title">Por que escolher a <span>RECORDS WAY?</span></h2>
-      <p class="section-desc">Uma página direta, moderna e preparada para divulgar seus planos com aparência profissional.</p>
-      <div class="about-grid">
-        <div class="box"><h3>Visual profissional</h3><p>Design vermelho e preto com destaque para os conteúdos e pacotes.</p></div>
-        <div class="box"><h3>Pronto para celular</h3><p>O site se adapta a telas de celular, tablet e computador.</p></div>
-        <div class="box"><h3>Contato rápido</h3><p>Botões de WhatsApp posicionados para facilitar a contratação.</p></div>
-      </div>
-    </section>
-
-    <section class="contact" id="contato">
-      <h2 class="section-title">Fale <span>conosco</span></h2>
-      <p class="section-desc">Clique no botão abaixo e solicite seu pacote agora.</p>
-      <div class="phone">62 3413-3632</div>
-      <a class="btn" href="https://wa.me/556234133632" target="_blank">CHAMAR NO WHATSAPP</a>
+      <div class="content-row" id="favoritesGrid"></div>
     </section>
   </main>
 
-  <a class="whatsapp-float" href="https://wa.me/556234133632" target="_blank">☎</a>
-
   <footer>
-    © 2026 RECORDS WAY. Todos os direitos reservados.
+    <div class="footer-brand">RECORDS <strong>WAY</strong></div>
+    <p>Web Player demonstrativo para conteúdos próprios ou devidamente licenciados.</p>
+    <a href="https://recordswatv.com.br" target="_blank" rel="noopener">recordswatv.com.br</a>
   </footer>
+
+  <div class="modal" id="playerModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="player-shell" role="dialog" aria-modal="true" aria-label="Player de vídeo">
+      <div class="player-header">
+        <div>
+          <span class="live-badge" id="playerBadge">AO VIVO</span>
+          <h3 id="playerTitle">Canal demonstrativo</h3>
+        </div>
+        <button class="close-btn" data-close-modal aria-label="Fechar player">×</button>
+      </div>
+      <div class="video-frame">
+        <video id="videoPlayer" controls playsinline></video>
+        <div class="video-status" id="videoStatus">Preparando transmissão...</div>
+      </div>
+      <div class="player-details">
+        <p id="playerDescription"></p>
+        <a class="support-btn" href="https://recordswatv.com.br" target="_blank" rel="noopener">Acessar site</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="infoModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-info></div>
+    <div class="info-card" role="dialog" aria-modal="true">
+      <button class="close-btn" data-close-info aria-label="Fechar informações">×</button>
+      <span class="section-kicker" id="infoType"></span>
+      <h2 id="infoTitle"></h2>
+      <p id="infoDescription"></p>
+      <div class="info-actions">
+        <button class="btn btn-primary" id="infoPlay">▶ Assistir</button>
+        <button class="round-btn" id="infoFavorite" aria-label="Adicionar à lista">＋</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+  <script src="app.js"></script>
 </body>
 </html>
