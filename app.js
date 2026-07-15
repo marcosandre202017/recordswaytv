@@ -1,178 +1,22 @@
-const demoStream = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
-
-const catalog = [
-  { id: "destaque", title: "RECORDS WAY LIVE", type: "live", category: "Destaque", description: "Experiência demonstrativa de transmissão HLS no navegador.", stream: demoStream, art: "linear-gradient(130deg,#5b0006,#e50914 48%,#090909)" },
-  { id: "live-1", title: "Arena Sports", type: "live", category: "Esportes", description: "Canal demonstrativo para eventos esportivos licenciados.", stream: demoStream, art: "linear-gradient(135deg,#111,#8d0008 55%,#e50914)" },
-  { id: "live-2", title: "Cinema Max", type: "live", category: "Filmes", description: "Programação demonstrativa de filmes e especiais.", stream: demoStream, art: "linear-gradient(135deg,#020024,#31004f,#8a0012)" },
-  { id: "live-3", title: "News 24", type: "live", category: "Notícias", description: "Canal demonstrativo de notícias 24 horas.", stream: demoStream, art: "linear-gradient(135deg,#051937,#004d7a,#e50914)" },
-  { id: "live-4", title: "Kids Play", type: "live", category: "Infantil", description: "Conteúdo infantil autorizado para toda a família.", stream: demoStream, art: "linear-gradient(135deg,#5f2c82,#49a09d,#e50914)" },
-  { id: "live-5", title: "Mundo Doc", type: "live", category: "Documentários", description: "Natureza, ciência e histórias reais.", stream: demoStream, art: "linear-gradient(135deg,#0f2027,#2c5364,#8c1b20)" },
-  { id: "movie-1", title: "Última Rota", type: "movie", category: "Ação • 2026", description: "Uma missão de alto risco transforma uma fuga em uma corrida contra o tempo.", stream: demoStream, art: "linear-gradient(135deg,#0a0a0a,#4b0005,#e50914)" },
-  { id: "movie-2", title: "Código Vermelho", type: "movie", category: "Suspense • 2026", description: "Um analista descobre uma ameaça escondida dentro do próprio sistema.", stream: demoStream, art: "linear-gradient(135deg,#1f1c2c,#3b0d18,#e50914)" },
-  { id: "movie-3", title: "Depois da Meia-Noite", type: "movie", category: "Drama • 2025", description: "Segredos antigos voltam à tona durante uma noite inesperada.", stream: demoStream, art: "linear-gradient(135deg,#141e30,#243b55,#8b0008)" },
-  { id: "movie-4", title: "Linha de Frente", type: "movie", category: "Ação • 2026", description: "Um grupo precisa proteger a cidade antes do amanhecer.", stream: demoStream, art: "linear-gradient(135deg,#200122,#6f0000,#111)" },
-  { id: "movie-5", title: "Horizonte Final", type: "movie", category: "Ficção • 2026", description: "Uma expedição espacial recebe um sinal impossível de ignorar.", stream: demoStream, art: "linear-gradient(135deg,#000428,#004e92,#8a0012)" },
-  { id: "series-1", title: "Distrito 9", type: "series", category: "Série • 2 temporadas", description: "Investigadores encaram crimes que ninguém mais consegue explicar.", stream: demoStream, art: "linear-gradient(135deg,#232526,#414345,#a4000a)" },
-  { id: "series-2", title: "A Firma", type: "series", category: "Série • 1 temporada", description: "Poder, ambição e segredos nos bastidores de um grande império.", stream: demoStream, art: "linear-gradient(135deg,#0f0c29,#302b63,#780009)" },
-  { id: "series-3", title: "Zona Restrita", type: "series", category: "Série • 3 temporadas", description: "Uma equipe especial enfrenta ameaças além dos limites conhecidos.", stream: demoStream, art: "linear-gradient(135deg,#000,#434343,#9d0008)" },
-  { id: "series-4", title: "Ponto Cego", type: "series", category: "Série • 1 temporada", description: "Cada pista revela uma verdade mais perigosa que a anterior.", stream: demoStream, art: "linear-gradient(135deg,#16222a,#3a6073,#a00009)" },
-  { id: "series-5", title: "Recomeço", type: "series", category: "Série • 2 temporadas", description: "Uma história sobre escolhas, perdas e novas oportunidades.", stream: demoStream, art: "linear-gradient(135deg,#42275a,#734b6d,#a30009)" }
-];
-
-let hls = null;
-let currentInfoId = null;
-const favorites = new Set(JSON.parse(localStorage.getItem("rw-favorites") || "[]"));
-
-const byId = (id) => document.getElementById(id);
-const playerModal = byId("playerModal");
-const infoModal = byId("infoModal");
-const video = byId("videoPlayer");
-
-function cardTemplate(item) {
-  const isFav = favorites.has(item.id);
-  return `
-    <article class="card" data-title="${item.title.toLowerCase()}" style="--art:${item.art}">
-      <div class="card-art"></div>
-      <div class="card-body">
-        <h3 class="card-title">${item.title}</h3>
-        <div class="card-meta">${item.type === "live" ? '<span class="status-dot"></span>AO VIVO • ' : ""}${item.category}</div>
-        <div class="card-actions">
-          <button class="mini-btn play" data-play-id="${item.id}" aria-label="Assistir ${item.title}">▶</button>
-          <button class="mini-btn ${isFav ? "active" : ""}" data-favorite-id="${item.id}" aria-label="Adicionar à lista">${isFav ? "✓" : "+"}</button>
-          <button class="mini-btn" data-info-id="${item.id}" aria-label="Mais informações">i</button>
-        </div>
-      </div>
-    </article>`;
-}
-
-function renderCatalog() {
-  byId("liveGrid").innerHTML = catalog.filter(i => i.type === "live" && i.id !== "destaque").map(cardTemplate).join("");
-  byId("moviesGrid").innerHTML = catalog.filter(i => i.type === "movie").map(cardTemplate).join("");
-  byId("seriesGrid").innerHTML = catalog.filter(i => i.type === "series").map(cardTemplate).join("");
-  const favItems = catalog.filter(i => favorites.has(i.id));
-  byId("favoritesGrid").innerHTML = favItems.map(cardTemplate).join("");
-  byId("emptyList").style.display = favItems.length ? "none" : "grid";
-}
-
-function openPlayer(id) {
-  const item = catalog.find(i => i.id === id);
-  if (!item) return;
-
-  byId("playerTitle").textContent = item.title;
-  byId("playerDescription").textContent = item.description;
-  byId("playerBadge").textContent = item.type === "live" ? "AO VIVO" : "VÍDEO";
-  byId("videoStatus").style.display = "grid";
-  byId("videoStatus").textContent = "Preparando transmissão...";
-  playerModal.classList.add("open");
-  playerModal.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
-
-  if (hls) { hls.destroy(); hls = null; }
-  video.removeAttribute("src");
-
-  if (window.Hls && Hls.isSupported()) {
-    hls = new Hls({ enableWorker: true, lowLatencyMode: true });
-    hls.loadSource(item.stream);
-    hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      byId("videoStatus").style.display = "none";
-      video.play().catch(() => {});
-    });
-    hls.on(Hls.Events.ERROR, (_, data) => {
-      if (data.fatal) byId("videoStatus").textContent = "Não foi possível carregar esta transmissão.";
-    });
-  } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-    video.src = item.stream;
-    video.addEventListener("loadedmetadata", () => {
-      byId("videoStatus").style.display = "none";
-      video.play().catch(() => {});
-    }, { once: true });
-  } else {
-    byId("videoStatus").textContent = "Este navegador não oferece suporte a HLS.";
-  }
-}
-
-function closePlayer() {
-  playerModal.classList.remove("open");
-  playerModal.setAttribute("aria-hidden", "true");
-  video.pause();
-  if (hls) { hls.destroy(); hls = null; }
-  video.removeAttribute("src");
-  document.body.style.overflow = "";
-}
-
-function openInfo(id) {
-  const item = catalog.find(i => i.id === id);
-  if (!item) return;
-  currentInfoId = id;
-  byId("infoType").textContent = item.type === "live" ? "CANAL AO VIVO" : item.type === "movie" ? "FILME" : "SÉRIE";
-  byId("infoTitle").textContent = item.title;
-  byId("infoDescription").textContent = item.description;
-  byId("infoFavorite").textContent = favorites.has(id) ? "✓" : "+";
-  byId("infoFavorite").classList.toggle("active", favorites.has(id));
-  infoModal.classList.add("open");
-  infoModal.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
-}
-
-function closeInfo() {
-  infoModal.classList.remove("open");
-  infoModal.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "";
-}
-
-function toggleFavorite(id) {
-  if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
-  localStorage.setItem("rw-favorites", JSON.stringify([...favorites]));
-  renderCatalog();
-  if (currentInfoId === id && infoModal.classList.contains("open")) openInfo(id);
-}
-
-document.addEventListener("click", (event) => {
-  const play = event.target.closest("[data-play-id]");
-  const info = event.target.closest("[data-info-id]");
-  const favorite = event.target.closest("[data-favorite-id]");
-  const arrow = event.target.closest("[data-carousel]");
-
-  if (play) openPlayer(play.dataset.playId);
-  if (info) openInfo(info.dataset.infoId);
-  if (favorite) toggleFavorite(favorite.dataset.favoriteId);
-  if (arrow) {
-    const row = byId(arrow.dataset.carousel);
-    row.scrollBy({ left: Number(arrow.dataset.direction) * row.clientWidth * .8, behavior: "smooth" });
-  }
-  if (event.target.closest("[data-close-modal]")) closePlayer();
-  if (event.target.closest("[data-close-info]")) closeInfo();
-});
-
-byId("infoPlay").addEventListener("click", () => {
-  closeInfo();
-  openPlayer(currentInfoId);
-});
-byId("infoFavorite").addEventListener("click", () => toggleFavorite(currentInfoId));
-
-const searchPanel = byId("searchPanel");
-byId("searchToggle").addEventListener("click", () => {
-  searchPanel.classList.add("open");
-  searchPanel.setAttribute("aria-hidden", "false");
-  byId("searchInput").focus();
-});
-byId("closeSearch").addEventListener("click", () => {
-  searchPanel.classList.remove("open");
-  searchPanel.setAttribute("aria-hidden", "true");
-  byId("searchInput").value = "";
-  document.querySelectorAll(".card").forEach(card => card.style.display = "block");
-});
-byId("searchInput").addEventListener("input", (event) => {
-  const term = event.target.value.trim().toLowerCase();
-  document.querySelectorAll(".card").forEach(card => {
-    card.style.display = !term || card.dataset.title.includes(term) ? "block" : "none";
-  });
-});
-
-window.addEventListener("scroll", () => byId("topbar").classList.toggle("scrolled", window.scrollY > 35));
-window.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") { closePlayer(); closeInfo(); }
-});
-
-renderCatalog();
+const state={server:'',user:'',pass:'',proxy:false,catalog:{live:[],movie:[],series:[]},categories:{live:[],movie:[],series:[]},limit:{live:24,movie:24,series:24},current:null};
+let hls=null;const $=id=>document.getElementById(id);const favorites=new Set(JSON.parse(localStorage.getItem('rw-favorites-v2')||'[]'));
+const normalizeServer=v=>v.trim().replace(/\/+$/,'');
+function apiUrl(action,params={}){const base=state.proxy?'proxy.php':`${state.server}/player_api.php`;const q=new URLSearchParams({...(state.proxy?{server:state.server}:{}),username:state.user,password:state.pass,...(action?{action}:{}),...params});return `${base}?${q}`;}
+async function request(action,params={}){const r=await fetch(apiUrl(action,params),{headers:{Accept:'application/json'}});if(!r.ok)throw new Error(`Servidor respondeu ${r.status}`);const data=await r.json();if(data?.user_info?.auth===0)throw new Error('Usuário ou senha inválidos.');return data;}
+function streamUrl(item){if(item.kind==='live')return `${state.server}/live/${encodeURIComponent(state.user)}/${encodeURIComponent(state.pass)}/${item.stream_id}.m3u8`;if(item.kind==='movie')return `${state.server}/movie/${encodeURIComponent(state.user)}/${encodeURIComponent(state.pass)}/${item.stream_id}.${item.container_extension||'mp4'}`;return item.url||'';}
+function mapItem(raw,kind){return{id:`${kind}-${raw.stream_id||raw.series_id}`,kind,title:raw.name||'Sem título',categoryId:String(raw.category_id||''),image:raw.stream_icon||raw.cover||'',stream_id:raw.stream_id,series_id:raw.series_id,container_extension:raw.container_extension,rating:raw.rating||'',description:raw.plot||raw.epg_channel_id||''};}
+async function login(e){e.preventDefault();const status=$('loginStatus');status.className='login-status';status.textContent='Conectando ao servidor...';state.server=normalizeServer($('serverUrl').value);state.user=$('username').value.trim();state.pass=$('password').value;state.proxy=$('useProxy').checked;if($('rememberServer').checked)localStorage.setItem('rw-server',state.server);else localStorage.removeItem('rw-server');try{const account=await request('');if(!account.user_info||String(account.user_info.auth)!=='1')throw new Error('Acesso não autorizado.');status.textContent='Acesso confirmado. Carregando catálogo...';status.classList.add('ok');await loadCatalog();$('accountInfo').textContent=`Conectado como ${state.user}${account.user_info.exp_date?` • validade: ${new Date(Number(account.user_info.exp_date)*1000).toLocaleDateString('pt-BR')}`:''}`;$('loginScreen').hidden=true;$('app').hidden=false;renderAll();}catch(err){status.textContent=`Não foi possível entrar: ${err.message} Verifique DNS, credenciais, HTTPS e CORS.`;}}
+async function loadCatalog(){const [lc,mc,sc,l,m,s]=await Promise.all([request('get_live_categories'),request('get_vod_categories'),request('get_series_categories'),request('get_live_streams'),request('get_vod_streams'),request('get_series')]);state.categories.live=Array.isArray(lc)?lc:[];state.categories.movie=Array.isArray(mc)?mc:[];state.categories.series=Array.isArray(sc)?sc:[];state.catalog.live=(Array.isArray(l)?l:[]).map(x=>mapItem(x,'live'));state.catalog.movie=(Array.isArray(m)?m:[]).map(x=>mapItem(x,'movie'));state.catalog.series=(Array.isArray(s)?s:[]).map(x=>mapItem(x,'series'));fillCategories();}
+function fillCategories(){[['live','liveCategory'],['movie','movieCategory'],['series','seriesCategory']].forEach(([kind,id])=>{const sel=$(id);sel.innerHTML='<option value="">Todas as categorias</option>'+state.categories[kind].map(c=>`<option value="${escapeHtml(String(c.category_id))}">${escapeHtml(c.category_name)}</option>`).join('');});}
+function escapeHtml(v=''){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+function card(item){const fav=favorites.has(item.id);return `<article class="card" data-title="${escapeHtml(item.title.toLowerCase())}"><div class="card-art">${item.image?`<img class="card-image" loading="lazy" referrerpolicy="no-referrer" src="${escapeHtml(item.image)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'card-placeholder',textContent:'${escapeHtml(item.title).replace(/'/g,'\\\'')}' }))">`:`<div class="card-placeholder">${escapeHtml(item.title)}</div>`}</div><div class="card-body"><h3 class="card-title">${escapeHtml(item.title)}</h3><div class="card-meta">${item.kind==='live'?'<span class="status-dot"></span> AO VIVO':item.kind==='movie'?'FILME':'SÉRIE'} ${item.rating?`• ${escapeHtml(item.rating)}`:''}</div><div class="card-actions">${item.kind!=='series'?`<button class="mini-btn play" data-play="${item.id}">▶</button>`:''}<button class="mini-btn ${fav?'active':''}" data-fav="${item.id}">${fav?'✓':'+'}</button></div></div></article>`;}
+function selected(kind){const id=kind==='live'?'liveCategory':kind==='movie'?'movieCategory':'seriesCategory';const cat=$(id).value;const term=$('searchInput').value.trim().toLowerCase();return state.catalog[kind].filter(x=>(!cat||x.categoryId===cat)&&(!term||x.title.toLowerCase().includes(term)));}
+function render(kind){const grid=kind==='live'?$('liveGrid'):kind==='movie'?$('moviesGrid'):$('seriesGrid');grid.innerHTML=selected(kind).slice(0,state.limit[kind]).map(card).join('')||'<div class="error-box">Nenhum conteúdo encontrado nesta categoria.</div>';}
+function renderFavorites(){const all=[...state.catalog.live,...state.catalog.movie,...state.catalog.series].filter(x=>favorites.has(x.id));$('favoritesGrid').innerHTML=all.map(card).join('');$('emptyList').style.display=all.length?'none':'grid';}
+function renderAll(){render('live');render('movie');render('series');renderFavorites();}
+async function playItem(id){const item=[...state.catalog.live,...state.catalog.movie].find(x=>x.id===id);if(!item)return;state.current=item;$('playerTitle').textContent=item.title;$('playerDescription').textContent=item.description||'';$('playerBadge').textContent=item.kind==='live'?'AO VIVO':'FILME';$('playerModal').classList.add('open');document.body.style.overflow='hidden';const url=streamUrl(item);$('videoStatus').style.display='grid';$('videoStatus').textContent='Preparando transmissão...';if(hls){hls.destroy();hls=null;}$('videoPlayer').removeAttribute('src');if(item.kind==='live'&&window.Hls&&Hls.isSupported()){hls=new Hls();hls.loadSource(url);hls.attachMedia($('videoPlayer'));hls.on(Hls.Events.MANIFEST_PARSED,()=>{$('videoStatus').style.display='none';$('videoPlayer').play().catch(()=>{});});hls.on(Hls.Events.ERROR,(_,d)=>{if(d.fatal)$('videoStatus').textContent='Falha ao carregar. O servidor pode bloquear reprodução no navegador.';});}else{$('videoPlayer').src=url;$('videoPlayer').onloadedmetadata=()=>{$('videoStatus').style.display='none';$('videoPlayer').play().catch(()=>{});};$('videoPlayer').onerror=()=>{$('videoStatus').textContent='Formato não suportado ou acesso bloqueado pelo servidor.';};}}
+function closePlayer(){$('playerModal').classList.remove('open');$('videoPlayer').pause();$('videoPlayer').removeAttribute('src');if(hls){hls.destroy();hls=null;}document.body.style.overflow='';}
+function logout(){closePlayer();state.pass='';state.user='';state.catalog={live:[],movie:[],series:[]};$('app').hidden=true;$('loginScreen').hidden=false;$('password').value='';$('loginStatus').textContent='Sessão encerrada.';}
+$('loginForm').addEventListener('submit',login);$('logoutBtn').addEventListener('click',logout);$('serverUrl').value=localStorage.getItem('rw-server')||'';$('rememberServer').checked=!!localStorage.getItem('rw-server');
+document.addEventListener('click',e=>{const p=e.target.closest('[data-play]'),f=e.target.closest('[data-fav]'),m=e.target.closest('[data-kind]');if(p)playItem(p.dataset.play);if(f){favorites.has(f.dataset.fav)?favorites.delete(f.dataset.fav):favorites.add(f.dataset.fav);localStorage.setItem('rw-favorites-v2',JSON.stringify([...favorites]));renderAll();}if(m){state.limit[m.dataset.kind]+=24;render(m.dataset.kind);}if(e.target.closest('[data-close-modal]'))closePlayer();});
+['liveCategory','movieCategory','seriesCategory'].forEach(id=>$(id).addEventListener('change',renderAll));$('searchToggle').addEventListener('click',()=>{$('searchPanel').classList.add('open');$('searchInput').focus();});$('closeSearch').addEventListener('click',()=>{$('searchPanel').classList.remove('open');$('searchInput').value='';renderAll();});$('searchInput').addEventListener('input',renderAll);window.addEventListener('keydown',e=>{if(e.key==='Escape')closePlayer();});

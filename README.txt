@@ -1,25 +1,16 @@
-RECORDS WAY — WEB PLAYER DEMONSTRATIVO
+RECORDS WAY WEB PLAYER — LOGIN POR DNS
 
-ARQUIVOS
-- index.html
-- styles.css
-- app.js
-
-COMO ABRIR
-1. Extraia o arquivo ZIP.
-2. Abra index.html no navegador.
-3. Para publicar, envie os três arquivos para GitHub Pages, Cloudflare Pages ou sua hospedagem.
-
-COMO TROCAR OS LINKS DE VÍDEO
-1. Abra app.js em um editor de texto.
-2. Localize a constante catalog.
-3. Troque o valor do campo stream pelo seu link HLS/M3U8 autorizado.
-
-EXEMPLO
-stream: "https://seu-servidor.com/canal/playlist.m3u8"
+1. Publique os arquivos em uma hospedagem HTTPS.
+2. Abra index.html.
+3. Informe DNS, usuário e senha de um servidor compatível com Xtream Codes.
+4. As credenciais permanecem somente na memória da aba. Apenas a DNS pode ser lembrada, se marcado.
 
 IMPORTANTE
-- O servidor de vídeo deve permitir reprodução no navegador e liberar CORS.
-- Links protegidos por DRM, autenticação específica ou bloqueio de origem podem exigir integração adicional no servidor.
-- Utilize apenas conteúdos próprios ou devidamente licenciados.
-- O link incluído no projeto é um stream público de teste, usado apenas para demonstração técnica.
+- Use somente conteúdo próprio ou licenciado.
+- O servidor precisa aceitar requisições do navegador (CORS) e reprodução HLS/MP4.
+- Uma página HTTPS não consegue consumir uma DNS HTTP por bloqueio de conteúdo misto.
+- GitHub Pages e Cloudflare Pages estático não executam proxy.php.
+- Para usar proxy.php, publique em hospedagem PHP e configure $allowedHosts e a DNS fixa.
+- Não deixe um proxy aberto para qualquer host.
+
+API esperada: /player_api.php no padrão Xtream Codes.
